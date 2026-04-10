@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Eye, EyeOff, BookOpen, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export default function AuthForm() {
   const { login, register } = useAuth();
@@ -32,10 +32,10 @@ export default function AuthForm() {
     <div className="w-full max-w-md">
       {/* Logo */}
       <div className="mb-8 flex flex-col items-center gap-3">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-lg shadow-violet-500/25">
-          <BookOpen className="h-7 w-7 text-white" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden bg-black/20 shadow-lg shadow-violet-500/25 border border-white/10 p-1">
+          <img src="/logo.png" alt="study ai logo" className="h-full w-full object-cover rounded-xl" />
         </div>
-        <h1 className="text-2xl font-bold text-white">StudyAI</h1>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">study ai</h1>
         <p className="text-slate-500 dark:text-slate-400 text-sm">Your AI-powered study companion</p>
       </div>
 

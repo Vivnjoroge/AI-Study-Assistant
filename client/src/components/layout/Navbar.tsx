@@ -1,7 +1,7 @@
 import { useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
-import { BookOpen, LogOut, UploadCloud, MessageSquare, LayoutDashboard, Sun, Moon } from 'lucide-react';
+import { LogOut, UploadCloud, MessageSquare, LayoutDashboard, Sun, Moon } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -18,12 +18,12 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0f0f1a]/80 backdrop-blur-lg">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         {/* Logo */}
-        <Link to="/dashboard" className="flex items-center gap-2 font-bold text-lg">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-600">
-            <BookOpen className="h-4 w-4 text-white" />
+        <Link to="/dashboard" className="flex items-center gap-2 font-bold text-lg group">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg overflow-hidden border border-white/10 p-0.5 group-hover:border-violet-500/40 transition-colors">
+            <img src="/logo.png" alt="study ai logo" className="h-full w-full object-cover rounded-md" />
           </div>
-          <span className="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">
-            StudyAI
+          <span className="bg-gradient-to-r from-violet-500 to-indigo-500 bg-clip-text text-transparent tracking-tight">
+            study ai
           </span>
         </Link>
 
