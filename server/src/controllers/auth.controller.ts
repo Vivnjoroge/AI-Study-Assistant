@@ -5,6 +5,7 @@ import * as authService from '../services/auth.service';
 const RegisterSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
+  fullName: z.string().optional(),
 });
 
 const LoginSchema = z.object({
@@ -14,8 +15,8 @@ const LoginSchema = z.object({
 
 export async function registerHandler(req: Request, res: Response, next: NextFunction) {
   try {
-    const { email, password } = RegisterSchema.parse(req.body);
-    const token = await authService.register(email, password);
+    const { email, password, fullName } = RegisterSchema.parse(req.body);
+    const token = await authService.register(email, password, fullName);
     res.status(201).json({ token, message: 'Account created successfully' });
   } catch (err) {
     next(err);

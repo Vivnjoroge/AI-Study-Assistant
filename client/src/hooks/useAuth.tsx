@@ -8,7 +8,7 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, fullName?: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -40,9 +40,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     navigate('/dashboard');
   };
 
-  const register = async (email: string, password: string) => {
-    const res = await api.post('/auth/register', { email, password });
-    const { token: t } = res.data;
+  const register = async (email: string, password: string, fullName?: string) => {
+    await api.post('/auth/register', { email, password, fullName });
     // After register, log them in automatically
     await login(email, password);
   };

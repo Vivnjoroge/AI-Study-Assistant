@@ -5,8 +5,10 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react';
 export default function AuthForm() {
   const { login, register } = useAuth();
   const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -19,7 +21,12 @@ export default function AuthForm() {
       if (mode === 'login') {
         await login(email, password);
       } else {
-        await register(email, password);
+        if (password !== confirmPassword) {
+          setError('Passwords do not match');
+          setLoading(false);
+          return;
+        }
+        await register(email, password, fullName);
       }
     } catch (err: any) {
       setError(err.response?.data?.error || 'Something went wrong. Please try again.');
@@ -59,6 +66,20 @@ export default function AuthForm() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {mode === 'register' && (
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-slate-300">Full Name</label>
+              <input
+                id="name-input"
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white shadow-sm dark:shadow-none dark:bg-white/5 px-4 py-3 text-slate-900 dark:text-white placeholder-slate-500 outline-none ring-0 transition focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                placeholder="John Doe"
+              />
+            </div>
+          )}
+
           <div>
             <label className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-slate-300">Email</label>
             <input
@@ -67,7 +88,7 @@ export default function AuthForm() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white shadow-sm dark:shadow-none dark:bg-white/5 px-4 py-3 text-white placeholder-slate-500 outline-none ring-0 transition focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+              className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white shadow-sm dark:shadow-none dark:bg-white/5 px-4 py-3 text-slate-900 dark:text-white placeholder-slate-500 outline-none ring-0 transition focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
               placeholder="you@example.com"
             />
           </div>
@@ -82,7 +103,7 @@ export default function AuthForm() {
                 minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white shadow-sm dark:shadow-none dark:bg-white/5 px-4 py-3 pr-12 text-white placeholder-slate-500 outline-none ring-0 transition focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white shadow-sm dark:shadow-none dark:bg-white/5 px-4 py-3 pr-12 text-slate-900 dark:text-white placeholder-slate-500 outline-none ring-0 transition focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
                 placeholder="••••••••"
               />
               <button
@@ -93,10 +114,22 @@ export default function AuthForm() {
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {mode === 'register' && (
-              <p className="mt-1 text-xs text-slate-500">Minimum 8 characters</p>
-            )}
           </div>
+
+          {mode === 'register' && (
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-slate-300">Confirm Password</label>
+              <input
+                id="confirm-password-input"
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white shadow-sm dark:shadow-none dark:bg-white/5 px-4 py-3 text-slate-900 dark:text-white placeholder-slate-500 outline-none ring-0 transition focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                placeholder="••••••••"
+              />
+            </div>
+          )}
 
           {error && (
             <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
