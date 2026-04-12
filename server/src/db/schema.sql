@@ -27,13 +27,13 @@ CREATE TABLE IF NOT EXISTS documents (
 );
 
 -- Document chunks: stores text segments with their vector embeddings
--- embedding is a 1536-dimensional vector (OpenAI text-embedding-ada-002)
+-- embedding is a 768-dimensional vector (Google Gemini text-embedding-004 / gemini-embedding-001)
 CREATE TABLE IF NOT EXISTS document_chunks (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
   chunk_index INTEGER NOT NULL,
-  embedding VECTOR(1536),
+  embedding VECTOR(768),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

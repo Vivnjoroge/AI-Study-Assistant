@@ -1,7 +1,8 @@
 import fs from 'fs';
+import path from 'path';
 import pdfParse from 'pdf-parse';
 import pool from '../db/pool';
-import { createEmbedding } from './ai.service';
+import { createEmbedding, createEmbeddingsBatch } from './ai.service';
 import { DocumentChunk, MessageSource } from '../types';
 
 const CHUNK_SIZE = 800;      // Target characters per chunk
@@ -32,11 +33,19 @@ export function chunkText(text: string): string[] {
     }
 
     const chunk = normalized.slice(start, end).trim();
-    if (chunk.length > 50) { // Skip very short chunks
+    if (chunk.length > 50) {
       chunks.push(chunk);
     }
 
+    // BREAK CONDITION: If we reached the end of the text, stop here.
+    if (end >= normalized.length) break;
+
+    // Advance start, ensuring we always progress forward
     start = end - CHUNK_OVERLAP;
+    
+    // Safety: If for some reason start didn't move forward (e.g. overlap >= length),
+    // force it to move to prevent infinite loop.
+    if (start < 0) start = end;
   }
 
   return chunks;
@@ -48,33 +57,50 @@ export function chunkText(text: string): string[] {
  */
 export async function processDocument(filePath: string, documentId: string): Promise<void> {
   const client = await pool.connect();
+  console.log(`📂 Starting processing for document: ${documentId}`);
 
   try {
     // 1. Extract text from PDF
+    console.log(`📄 [1/4] Extracting text from PDF...`);
     const dataBuffer = fs.readFileSync(filePath);
     const pdfData = await pdfParse(dataBuffer);
     const text = pdfData.text;
     const pageCount = pdfData.numpages;
+    console.log(`✅ Text extracted. Pages: ${pageCount}, Total characters: ${text.length}`);
 
     // 2. Split into chunks
+    console.log(`✂️ [2/4] Chunking text...`);
     const chunks = chunkText(text);
+    console.log(`✅ Chunking complete. Generated ${chunks.length} chunks.`);
 
     // 3. Generate embeddings and store chunks in a transaction
+    console.log(`🧠 [3/4] Generating embeddings & storing (Batching enabled)...`);
     await client.query('BEGIN');
 
-    for (let i = 0; i < chunks.length; i++) {
-      const embedding = await createEmbedding(chunks[i]);
-      // Store embedding as a Postgres vector literal
-      const vectorLiteral = `[${embedding.join(',')}]`;
+    const BATCH_SIZE = 20; // Process 20 chunks at once
+    for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
+      const batch = chunks.slice(i, i + BATCH_SIZE);
+      const batchEmbeddings = await createEmbeddingsBatch(batch);
 
-      await client.query(
-        `INSERT INTO document_chunks (document_id, content, chunk_index, embedding)
-         VALUES ($1, $2, $3, $4::vector)`,
-        [documentId, chunks[i], i, vectorLiteral]
-      );
+      for (let j = 0; j < batch.length; j++) {
+        const chunkIndex = i + j;
+        const embedding = batchEmbeddings[j];
+        const vectorLiteral = `[${embedding.join(',')}]`;
+
+        await client.query(
+          `INSERT INTO document_chunks (document_id, content, chunk_index, embedding)
+           VALUES ($1, $2, $3, $4::vector)`,
+          [documentId, batch[j], chunkIndex, vectorLiteral]
+        );
+      }
+      
+      if (i % (BATCH_SIZE * 5) === 0 || i + BATCH_SIZE >= chunks.length) {
+        console.log(`   ⏳ Progress: ${Math.min(i + BATCH_SIZE, chunks.length)}/${chunks.length} chunks...`);
+      }
     }
 
     // 4. Mark document as ready
+    console.log(`📝 [4/4] Finishing up...`);
     await client.query(
       `UPDATE documents SET status = 'ready', page_count = $1, chunk_count = $2 WHERE id = $3`,
       [pageCount, chunks.length, documentId]
@@ -82,12 +108,19 @@ export async function processDocument(filePath: string, documentId: string): Pro
 
     await client.query('COMMIT');
 
-    console.log(`✅ Document ${documentId} processed: ${chunks.length} chunks from ${pageCount} pages`);
-  } catch (err) {
+    console.log(`✅ Document ${documentId} successfully processed!`);
+  } catch (err: any) {
     await client.query('ROLLBACK');
     // Mark document as failed
     await pool.query(`UPDATE documents SET status = 'error' WHERE id = $1`, [documentId]);
-    console.error(`❌ Failed to process document ${documentId}:`, err);
+    
+    // Detailed error logging to file for debugging
+    const errorLog = `[${new Date().toISOString()}] ❌ Failed to process document ${documentId}:
+Error: ${err.message}
+Stack: ${err.stack}\n\n`;
+    
+    fs.appendFileSync(path.join(process.cwd(), 'error.log'), errorLog);
+    console.error(`❌ Failed to process document ${documentId}:`, err.message);
     throw err;
   } finally {
     client.release();

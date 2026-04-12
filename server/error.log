@@ -1,0 +1,54 @@
+[2026-04-11T10:14:16.710Z] ❌ Failed to process document 5618ae72-1a2a-4a43-b559-1f11e3e20250:
+Error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.
+Stack: Error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.
+    at APIError.generate (/home/ubuntu/myprojects/ai-study-assist/server/node_modules/openai/src/error.ts:96:14)
+    at OpenAI.makeStatusError (/home/ubuntu/myprojects/ai-study-assist/server/node_modules/openai/src/core.ts:462:21)
+    at OpenAI.makeRequest (/home/ubuntu/myprojects/ai-study-assist/server/node_modules/openai/src/core.ts:526:24)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at createEmbeddingsBatch (/home/ubuntu/myprojects/ai-study-assist/server/src/services/ai.service.ts:27:20)
+    at processDocument (/home/ubuntu/myprojects/ai-study-assist/server/src/services/document.service.ts:83:31)
+
+[2026-04-11T10:15:07.048Z] ❌ Failed to process document 51e90856-813a-47db-9121-a827d2fd0675:
+Error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.
+Stack: Error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.
+    at APIError.generate (/home/ubuntu/myprojects/ai-study-assist/server/node_modules/openai/src/error.ts:96:14)
+    at OpenAI.makeStatusError (/home/ubuntu/myprojects/ai-study-assist/server/node_modules/openai/src/core.ts:462:21)
+    at OpenAI.makeRequest (/home/ubuntu/myprojects/ai-study-assist/server/node_modules/openai/src/core.ts:526:24)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at createEmbeddingsBatch (/home/ubuntu/myprojects/ai-study-assist/server/src/services/ai.service.ts:27:20)
+    at processDocument (/home/ubuntu/myprojects/ai-study-assist/server/src/services/document.service.ts:83:31)
+
+[2026-04-11T12:28:11.120Z] ❌ Failed to process document 18c74090-5bbb-4f23-82f2-5f9b32dc8793:
+Error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:batchEmbedContents: [404 Not Found] models/text-embedding-004 is not found for API version v1beta, or is not supported for embedContent. Call ListModels to see the list of available models and their supported methods.
+Stack: Error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:batchEmbedContents: [404 Not Found] models/text-embedding-004 is not found for API version v1beta, or is not supported for embedContent. Call ListModels to see the list of available models and their supported methods.
+    at handleResponseNotOk (/home/ubuntu/myprojects/ai-study-assist/server/node_modules/@google/generative-ai/dist/index.js:434:11)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at makeRequest (/home/ubuntu/myprojects/ai-study-assist/server/node_modules/@google/generative-ai/dist/index.js:403:9)
+    at batchEmbedContents (/home/ubuntu/myprojects/ai-study-assist/server/node_modules/@google/generative-ai/dist/index.js:1322:22)
+    at createEmbeddingsBatch (/home/ubuntu/myprojects/ai-study-assist/server/src/services/ai.service.ts:26:18)
+    at processDocument (/home/ubuntu/myprojects/ai-study-assist/server/src/services/document.service.ts:83:31)
+
+[2026-04-12T15:50:02.562Z] ❌ Failed to process document 0ed4de89-e1da-414b-b77f-4f29895003a5:
+Error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:batchEmbedContents: [404 Not Found] models/text-embedding-004 is not found for API version v1beta, or is not supported for embedContent. Call ListModels to see the list of available models and their supported methods.
+Stack: Error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:batchEmbedContents: [404 Not Found] models/text-embedding-004 is not found for API version v1beta, or is not supported for embedContent. Call ListModels to see the list of available models and their supported methods.
+    at handleResponseNotOk (/home/ubuntu/myprojects/ai-study-assist/server/node_modules/@google/generative-ai/dist/index.js:434:11)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at makeRequest (/home/ubuntu/myprojects/ai-study-assist/server/node_modules/@google/generative-ai/dist/index.js:403:9)
+    at batchEmbedContents (/home/ubuntu/myprojects/ai-study-assist/server/node_modules/@google/generative-ai/dist/index.js:1322:22)
+    at createEmbeddingsBatch (/home/ubuntu/myprojects/ai-study-assist/server/src/services/ai.service.ts:26:18)
+    at processDocument (/home/ubuntu/myprojects/ai-study-assist/server/src/services/document.service.ts:83:31)
+
+[2026-04-12T16:00:28.270Z] ❌ Failed to process document 2cafc9bb-1381-403e-b3c0-c47ac1d61b1c:
+Error: expected 768 dimensions, not 3072
+Stack: error: expected 768 dimensions, not 3072
+    at /home/ubuntu/myprojects/ai-study-assist/server/node_modules/pg/lib/client.js:631:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at processDocument (/home/ubuntu/myprojects/ai-study-assist/server/src/services/document.service.ts:90:9)
+
+[2026-04-12T16:02:28.174Z] ❌ Failed to process document 0aaff4d0-e732-4f09-ab6c-ae41c8171d1c:
+Error: expected 768 dimensions, not 3072
+Stack: error: expected 768 dimensions, not 3072
+    at /home/ubuntu/myprojects/ai-study-assist/server/node_modules/pg/lib/client.js:631:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at processDocument (/home/ubuntu/myprojects/ai-study-assist/server/src/services/document.service.ts:90:9)
+
