@@ -1,9 +1,11 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import path from 'path';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
 
 import authRoutes from './routes/auth.routes';
 import documentRoutes from './routes/document.routes';
@@ -11,8 +13,6 @@ import chatRoutes from './routes/chat.routes';
 import summarizeRoutes from './routes/summarize.routes';
 import quizRoutes from './routes/quiz.routes';
 import { errorHandler } from './middleware/errorHandler';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;

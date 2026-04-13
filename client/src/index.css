@@ -2,51 +2,93 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-* {
-  box-sizing: border-box;
-}
+@layer base {
+  :root {
+    --brand-violet: #8b5cf6;
+    --brand-indigo: #6366f1;
+    --brand-emerald: #10b981;
+    
+    --bg-light: #f8fafc;
+    --bg-dark: #0a0a14;
+    
+    --card-light: #ffffff;
+    --card-dark: #13131f;
+    
+    --border-light: #e2e8f0;
+    --border-dark: rgba(255, 255, 255, 0.08);
+  }
 
-html {
-  scroll-behavior: smooth;
-}
+  * {
+    box-sizing: border-box;
+    cursor: default;
+  }
+  
+  button, a {
+    cursor: pointer;
+  }
 
-body {
-  /* Colors managed by utility classes on App wrapper */
+  html {
+    scroll-behavior: smooth;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.3);
+  background: rgba(139, 92, 246, 0.2);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 92, 246, 0.6);
+  background: rgba(139, 92, 246, 0.5);
 }
 
-/* Prose overrides for assistant chat bubbles */
-.dark .prose-invert pre {
-  background: rgba(0,0,0,0.4) !important;
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 0.75rem;
+/* Animations */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.prose pre {
-  border-radius: 0.75rem;
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* smooth animations */
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.25s ease-out both;
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-slide-up { animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-slide-down { animation: slide-down 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-scale-in { animation: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-pulse-subtle { animation: pulse-subtle 2s ease-in-out infinite; }
+
+/* Custom Utilities */
+.glass-panel {
+  @apply backdrop-blur-xl border border-white/10 shadow-2xl;
+}
+
+.premium-gradient {
+  @apply bg-gradient-to-br from-violet-600 to-indigo-700 shadow-lg shadow-violet-500/20;
+}
+
+.premium-card {
+  @apply bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 transition-all duration-300;
 }

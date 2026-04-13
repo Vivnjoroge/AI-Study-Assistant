@@ -10,9 +10,30 @@ interface DocumentCardProps {
 }
 
 const statusConfig = {
-  processing: { icon: Loader2, color: 'text-amber-400', bg: 'bg-amber-400/10', label: 'Processing', spin: true },
-  ready: { icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-400/10', label: 'Ready', spin: false },
-  error: { icon: XCircle, color: 'text-red-400', bg: 'bg-red-400/10', label: 'Error', spin: false },
+  processing: { 
+    icon: Loader2, 
+    color: 'text-amber-500', 
+    bg: 'bg-amber-500/10', 
+    label: 'Processing', 
+    spin: true,
+    borderColor: 'border-amber-500/20'
+  },
+  ready: { 
+    icon: CheckCircle2, 
+    color: 'text-emerald-500', 
+    bg: 'bg-emerald-500/10', 
+    label: 'Ready', 
+    spin: false,
+    borderColor: 'border-emerald-500/20'
+  },
+  error: { 
+    icon: XCircle, 
+    color: 'text-red-500', 
+    bg: 'bg-red-500/10', 
+    label: 'Failed', 
+    spin: false,
+    borderColor: 'border-red-500/20'
+  },
 };
 
 export default function DocumentCard({ document, onDelete, onSummarize, onQuiz }: DocumentCardProps) {
@@ -24,72 +45,80 @@ export default function DocumentCard({ document, onDelete, onSummarize, onQuiz }
     new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
-    <div className="group relative flex flex-col gap-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-white shadow-sm dark:shadow-none dark:bg-white/5 p-5 transition-all hover:border-violet-500/30 hover:bg-slate-50 dark:bg-white/[0.07]">
+    <div className={`group relative flex flex-col gap-5 rounded-[2rem] p-6 premium-card hover:shadow-2xl hover:shadow-violet-500/5 hover:-translate-y-1 ${document.status === 'processing' ? 'animate-pulse-subtle' : ''}`}>
+      {/* Decorative gradient overlay */}
+      <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-violet-500/[0.02] to-indigo-500/[0.02] pointer-events-none" />
+
       {/* Header */}
-      <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-violet-500/10">
-          <FileText className="h-5 w-5 text-violet-400" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold text-white text-sm" title={document.file_name}>
-            {document.file_name}
-          </p>
-          <div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
-            <Clock className="h-3 w-3" />
-            {formatDate(document.created_at)}
+      <div className="relative flex items-start justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-violet-500/10 to-indigo-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20 group-hover:scale-110 transition-transform">
+            <FileText className="h-6 w-6" />
+          </div>
+          <div className="min-w-0">
+            <h3 className="truncate font-bold text-slate-900 dark:text-white text-base leading-tight" title={document.file_name}>
+              {document.file_name}
+            </h3>
+            <div className="mt-1.5 flex items-center gap-2 text-[11px] font-medium text-slate-500 uppercase tracking-widest">
+              <Clock className="h-3 w-3" />
+              {formatDate(document.created_at)}
+            </div>
           </div>
         </div>
-        {/* Status Badge */}
-        <div className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${cfg.bg} ${cfg.color}`}>
+
+        <button
+          onClick={() => onDelete(document.id)}
+          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-slate-400 transition-all hover:bg-red-500/10 hover:text-red-500"
+          title="Delete document"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
+
+      {/* Status & Stats */}
+      <div className="relative flex items-center justify-between">
+        <div className={`flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider ${cfg.bg} ${cfg.color} border ${cfg.borderColor}`}>
           <StatusIcon className={`h-3 w-3 ${cfg.spin ? 'animate-spin' : ''}`} />
           {cfg.label}
         </div>
+        
+        {document.status === 'ready' && (
+          <div className="flex items-center gap-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+            <span>{document.page_count} Pages</span>
+            <span className="h-1 w-1 rounded-full bg-slate-300 dark:bg-white/20" />
+            <span>{document.chunk_count} Chunks</span>
+          </div>
+        )}
       </div>
 
-      {/* Stats */}
-      {document.status === 'ready' && (
-        <div className="flex gap-4 text-xs text-slate-500 dark:text-slate-400">
-          <span>{document.page_count} pages</span>
-          <span>•</span>
-          <span>{document.chunk_count} chunks indexed</span>
-        </div>
-      )}
-
-      {/* Actions */}
-      <div className="flex items-center gap-2">
+      {/* Quick Actions */}
+      <div className="relative grid grid-cols-3 gap-2">
         <button
           id={`chat-doc-${document.id}`}
           disabled={document.status !== 'ready'}
           onClick={() => navigate(`/chat?docId=${document.id}`)}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-violet-600/20 px-3 py-2 text-xs font-medium text-violet-300 transition-all hover:bg-violet-600/30 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-violet-500/5 dark:bg-violet-400/10 py-3 text-[11px] font-bold text-violet-600 dark:text-violet-400 transition-all hover:bg-violet-600 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed group/btn shadow-sm"
         >
-          <MessageSquare className="h-3.5 w-3.5" />
-          Ask
+          <MessageSquare className="h-4 w-4 group-hover/btn:scale-110 transition-transform" />
+          Ask AI
         </button>
         <button
           id={`summarize-doc-${document.id}`}
           disabled={document.status !== 'ready'}
           onClick={() => onSummarize(document.id)}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-indigo-600/20 px-3 py-2 text-xs font-medium text-indigo-300 transition-all hover:bg-indigo-600/30 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-indigo-500/5 dark:bg-indigo-400/10 py-3 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 transition-all hover:bg-indigo-600 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed group/btn shadow-sm"
         >
-          <BookOpen className="h-3.5 w-3.5" />
-          Summarize
+          <BookOpen className="h-4 w-4 group-hover/btn:scale-110 transition-transform" />
+          Summary
         </button>
         <button
           id={`quiz-doc-${document.id}`}
           disabled={document.status !== 'ready'}
           onClick={() => onQuiz(document.id)}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-emerald-600/20 px-3 py-2 text-xs font-medium text-emerald-300 transition-all hover:bg-emerald-600/30 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-emerald-500/5 dark:bg-emerald-400/10 py-3 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 transition-all hover:bg-emerald-600 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed group/btn shadow-sm"
         >
-          <HelpCircle className="h-3.5 w-3.5" />
+          <HelpCircle className="h-4 w-4 group-hover/btn:scale-110 transition-transform" />
           Quiz
-        </button>
-        <button
-          id={`delete-doc-${document.id}`}
-          onClick={() => onDelete(document.id)}
-          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-slate-500 transition-all hover:bg-red-500/10 hover:text-red-400"
-        >
-          <Trash2 className="h-4 w-4" />
         </button>
       </div>
     </div>

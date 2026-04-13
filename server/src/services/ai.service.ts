@@ -1,10 +1,11 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { MCQQuestion } from '../types';
+import { createError } from '../middleware/errorHandler';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 const EMBEDDING_MODEL = 'gemini-embedding-001';
-const CHAT_MODEL = 'gemini-2.0-flash';
+const CHAT_MODEL = 'gemini-flash-latest';
 
 /**
  * Generate a 768-dimensional embedding vector for the given text.
@@ -53,10 +54,17 @@ export async function generateAnswer(
     : `You are a knowledgeable study assistant. Answer questions accurately using ONLY the provided document context.`;
 
   const prompt = `${systemPrompt}\n\nContext:\n${context}\n\nQuestion: ${question}`;
-
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  return response.text();
+  
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (err: any) {
+    if (err.message?.includes('429')) {
+      throw createError('AI rate limit exceeded. Please wait a minute and try again.', 429);
+    }
+    throw err;
+  }
 }
 
 /**
@@ -68,9 +76,16 @@ export async function summarize(text: string): Promise<string> {
 
   const prompt = `Summarize the following document accurately in markdown format with a brief overview and key bullet points:\n\n${truncated}`;
 
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  return response.text();
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (err: any) {
+    if (err.message?.includes('429')) {
+      throw createError('AI rate limit exceeded. Please wait a minute and try again.', 429);
+    }
+    throw err;
+  }
 }
 
 /**
@@ -104,9 +119,26 @@ Return ONLY valid JSON in this structure:
 
 Text:\n${truncated}`;
 
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  const raw = response.text();
-  const parsed = JSON.parse(raw);
-  return parsed.questions as MCQQuestion[];
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const raw = response.text();
+    
+    // Robust extraction: find the first { and last }
+    const jsonStart = raw.indexOf('{');
+    const jsonEnd = raw.lastIndexOf('}');
+    
+    if (jsonStart === -1 || jsonEnd === -1) {
+      throw createError('AI returned invalid JSON structure', 500);
+    }
+    
+    const jsonString = raw.substring(jsonStart, jsonEnd + 1);
+    const parsed = JSON.parse(jsonString);
+    return parsed.questions as MCQQuestion[];
+  } catch (err: any) {
+    if (err.message?.includes('429')) {
+      throw createError('AI rate limit exceeded. Please wait a minute and try again.', 429);
+    }
+    throw err;
+  }
 }

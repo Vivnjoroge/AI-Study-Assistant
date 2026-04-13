@@ -18,6 +18,12 @@ export const errorHandler = (
   const message = err.message || 'Internal Server Error';
 
   console.error(`[${new Date().toISOString()}] Error ${statusCode}: ${message}`);
+  
+  const fs = require('fs');
+  const path = require('path');
+  const logMessage = `[${new Date().toISOString()}] Error ${statusCode}: ${message}\n${err.stack}\n\n`;
+  fs.appendFileSync(path.join(process.cwd(), 'error.log'), logMessage);
+
   if (process.env.NODE_ENV === 'development') {
     console.error(err.stack);
   }

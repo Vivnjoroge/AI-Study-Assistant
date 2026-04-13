@@ -23,3 +23,9 @@ build/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Project local files
+server/error.log
+server/src/utils/
+server/test-flash.js
+server/test-list.ts
